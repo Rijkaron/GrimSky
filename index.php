@@ -14,10 +14,10 @@
    <meta name="msapplication-TileColor" content="#2b5797">
    <meta name="msapplication-TileImage" content="./content/icons/favicon/mstile-144x144.png">
    <meta name="msapplication-config" content="./content/icons/favicon/browserconfig.xml">
-
    <meta name="theme-color" content="#ffffff">
+
    <meta name="description" content="Yet Another Weather Website">
-   <meta name="keywords" content="GrimSky, Weather">
+   <meta name="keywords" content="GrimSky, Weather, Weer">
    <meta name="author" content="Aron, Cor">
    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
@@ -48,7 +48,7 @@
             </a>
             <a class="openPopupMobile" href="javascript:setPopupStatus(true)"><span>Verander plaats</span></a>
          </nav>
-         <button class="openPopup" type="button" onclick="setPopupStatus(true)">{{ city }}</button>
+         <button class="openPopup" type="button" onclick="setPopupStatus(true)">{{ city[0] }}</button>
          <div id="hamburger" onclick="toggleMobileNav()">
             <span></span>
             <span></span>
@@ -81,13 +81,13 @@
                   </div>
                </div>
                <a id="scroll" href="javascript:window.scroll({top: $(window).height(),behavior: 'smooth'})"><span></span></a>
+               <p>Laatste update om {{ laatsteUpdate | tijd }}</p>
             </section>
-            <!-- Overkill om nieuw element aan te maken, daarom inline styling -->
             <section id="meerWeer">
                <div>
                   <fieldset id="weerbericht">
-                     <legend>Wat doet het weer?</legend>
-                     <h2>{{ verhaal.titel }}</h2>
+                     <legend>Wat doet het weer?<span v-if="city[1] != 'NL'" style="font-size: 0.9rem;">&nbsp;(in Nederland)</span></legend>
+                     <h2>{{ verhaal.titel | capitalize }}</h2>
                      <h3>Door <b>{{ verhaal.auteur }}</b></h3>
                      <!-- v-html omdat er nog weleens htmlentities worden gebruikt in de buienradar api -->
                      <p v-html="verhaal.samenvatting"></p>
@@ -167,9 +167,10 @@
             </fieldset>
             <fieldset id="voorspellingUren">
                <legend>Uurlijkse voorspelling</legend>
+               <p class="scrollTip">Scroll horizontaal om meer uren te zien</p>
                <div>
                   <div v-for="(uur, index) in uren" v-if="index % settings.ElkeXUren == 0" :data-verschilDagen="uur.timestamp | verschilDagen">
-                     <p class="tijd">{{ uur.timestamp | tijd }}</p>
+                     <p class="tijd">{{ uur.timestamp | uur }}</p>
                      <img :src="uur.icon | path" :alt="uur.icon">
                      <p class="item Temperature">{{ uur.temperatuur | temperatuurEenheid }}</p>
                      <img class="neerslag" src="./content/icons/waterdrop.svg" :alt="uur.neerslagHoeveelheid" :data-neerslagLevel="uur.neerslagHoeveelheid | neerslagLevel">
@@ -233,7 +234,7 @@
                   <br>
                   Daarnaast zijn de JavaScript libaries <a href="https://jquery.com/" target="_blank">jQuery</a> en <a href="https://vuejs.org/" target="_blank">Vue</a> gebruikt.
                   <br>
-                  De weericoontjes komen van <a href="https://github.com/erikflowers/weather-icons">erikflowers</a>
+                  De weericoontjes komen van <a href="https://github.com/erikflowers/weather-icons">erikflowers</a>.
                </p>
                <p>De code van deze website is beschikbaar op <a href="https://github.com/Rijkaron/GrimSky" target="_blank">GitHub</a> onder de MIT licentie</p>
             </fieldset>

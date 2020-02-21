@@ -1,13 +1,17 @@
 <?php
-# Zet de content-type op JSON
+// Traag internet :(
+ini_set('max_execution_time', 200); 
+set_time_limit(200);
+
+// Zet de content-type op JSON
 header('Content-Type: application/json');
-# CORS
+// CORS
 header("Access-Control-Allow-Origin: *");
 
-# Hoe lang de cooldown duurt op het ophalen van nieuwe weerdata in seconden.
+// Hoe lang de cooldown duurt op het ophalen van nieuwe weerdata in seconden.
 $DATA_REFRESH_COOLDOWN = 20 * 60;
 
-# APIs :)
+// APIs :)
 define('OPENCAGE_APIKEY', "OPENCAGE_APIKEY");
 define('DARKSKY_APIKEY', "DARKSKY_APIKEY");
 
@@ -15,38 +19,38 @@ define('OPENCAGE_APIURL', "https://api.opencagedata.com/geocode/v1/json?q=");
 define('DARKSKY_APIURL', "https://api.darksky.net/forecast/". DARKSKY_APIKEY ."/");
 define('BUIENRADAR_APIURL', "https://data.buienradar.nl/2.0/feed/json");
 
-# Database
-$DATABASE_HOST = "DATABASE_HOST";
-$DATABASE_USER = "DATABASE_USER";
-$DATABASE_NAME = "DATABASE_NAME";
-$DATABASE_PASS = "DATABASE_PASS";
+// Database
+$DATABASE_HOST = 'DATABASE_HOST';
+$DATABASE_USER = 'DATABASE_USER';
+$DATABASE_NAME = 'DATABASE_NAME';
+$DATABASE_PASS = 'DATABASE_PASS';
 
-# Database verbinding maken
+// Database verbinding maken
 $conn = new \MySQLi($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ($conn->connect_errno) {
   error(500, "Fout met het verbinden met de database.");
   error_log("MySQLi error: " . $conn->connect_errno . ": " . $conn->connect_error);
 }
 
-# Krijg plaats
+// Krijg plaats
 $city = GET('plaats');
 
-# Kijkt of er een plaats gespecificeerd is, anders error.
+// Kijkt of er een plaats gespecificeerd is, anders error.
 $coords;
 if (empty($city)) {
   error(400, "Geen plaats gespecificeerd.");
 } else {
-  # City evt naar coords vertalen.
+  // City evt naar coords vertalen.
   $coords = getCoordsByCity($conn, $city);
   if ($coords == null) error(400, "$city niet gevonden.");
 }
 
-# Omzetten naar het goede formaat
+// Omzetten naar het goede formaat
 $city = getCityByCoords($conn, $coords);
 
 $JSON;
-# Data ophalen
-# Eerst proberen vanaf database
+// Data ophalen
+// Eerst proberen vanaf database
 $result = $conn->query("SELECT * FROM weer WHERE `stad`='$city' ORDER BY `timestamp` DESC LIMIT 1");
 if (!$result) {
   error(500, "Fout met het database query. (1)");
@@ -57,24 +61,25 @@ $dataFromDatabase = false;
 if ($result->num_rows == 1) {
   $row = $result->fetch_assoc();
   if ((time() - $row['timestamp']) <= $DATA_REFRESH_COOLDOWN && date("H") == date("H", $row['timestamp'])) {
-    # Data is nog niet verouderd en uur is nog niet veranderd.
+    // Data is nog niet verouderd en uur is nog niet veranderd.
     $dataFromDatabase = true;
     $JSON = json_decode($row['JSON'], true);
   } else {
-    # Verwijder oude data
-    if (!$conn->query("DELETE FROM weer WHERE `stad`='$city' AND `timestamp`='$row' ORDER BY `timestamp` DESC LIMIT 1")) {
+    // Verwijder oude data
+    if (!$conn->query("DELETE FROM weer WHERE `stad`='$city' AND `timestamp`='".$row['timestamp']."'")) {
       error(500, "Fout met het database query. (2)");
       error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
     }
   }
 }
 
-# Anders data van API halen.
+// Anders data van API halen.
 if (!$dataFromDatabase) {
   $DARKSKY_DATA = cURL(DARKSKY_APIURL . $coords . "?lang=nl&units=ca");
   $BUIENRADAR_DATA = cURL(BUIENRADAR_APIURL);
 
-  if ($DARKSKY_DATA['code'] != 200) {
+  // Als er een errorcode is
+  if (isset($DARKSKY_DATA['code'])) {
     error_log("DarkSky error " . $DARKSKY_DATA['code'] . ": " . $DARKSKY_DATA['error']);
     error($DARKSKY_DATA['code'], $DARKSKY_DATA['error']);
   }
@@ -145,7 +150,7 @@ function cURL($URL) {
   $response = curl_exec($cURL);
   curl_close($cURL);
 
-  # cURL response verwerken
+  // cURL response verwerken
   $data = json_decode($response, true);
   return $data;
 }
@@ -174,10 +179,10 @@ function getCoordsByCity($conn, $city) {
     $row = $result->fetch_assoc();
     return $row['coords'];
   } else {
-    # Pak de coordinaten uit de GEOCODE API
+    // Pak de coordinaten uit de GEOCODE API
     $URL = OPENCAGE_APIURL . urlencode($city) . "&key=" . OPENCAGE_APIKEY;
 
-    # cURL request
+    // cURL request
     $data = cURL($URL);
 
     if ($data['status']['code'] == 200) {
@@ -187,23 +192,23 @@ function getCoordsByCity($conn, $city) {
 
       $coords = $lat . "," . $lng;
 
-      # Zet plaats in het goede format (Stad,Land)
+      // Zet plaats in het goede format (Stad,Land)
       $city = getCityByCoords($conn, $coords);
 
-      # Voeg de data toe aan de database
+      // Voeg de data toe aan de database
       if (!$conn->query("INSERT INTO `steden` (`stad`, `coords`) VALUES ('$city', '$coords')")) {
         error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
         error(500, "Fout met het database query. (5)");
       }
       return $coords;
     }
-    # Als er teveel requests zijn gekomen (meer dan 1 per seconde)
+    // Als er teveel requests zijn gekomen (meer dan 1 per seconde)
     elseif ($data['status']['code'] == 429) {
-      # Wacht even
+      // Wacht even
       sleep(0.5);
       return getCoordsByCity($conn, $city);
     }
-    # Als er iets anders mis is, gooi een error
+    // Als er iets anders mis is, gooi een error
     else {
       error_log("Opencage error " . $data['status']['code'] . ": " . $data['status']['message']);
       error(500, "Er ging iets fout.");
@@ -233,10 +238,10 @@ function getCityByCoords($conn, $coords) {
     $row = $result->fetch_assoc();
     return $row['stad'];
   } else {
-    # Pak de coordinaten uit de GEOCODE API
+    // Pak de coordinaten uit de GEOCODE API
     $URL = OPENCAGE_APIURL . urlencode($coords) . "&key=" . OPENCAGE_APIKEY;
 
-    # cURL request
+    // cURL request
     $data = cURL($URL);
 
     if ($data['status']['code'] == 200) {
@@ -246,20 +251,20 @@ function getCityByCoords($conn, $coords) {
 
       $city = $stad . "," . $land;
 
-      # Voeg de data toe aan de database
+      // Voeg de data toe aan de database
       if (!$conn->query("INSERT INTO `steden` (`stad`, `coords`) VALUES ('$city', '$coords')")) {
         error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
         error(500, "Fout met het database query. (7)");
       }
       return $city;
     }
-    # Als er teveel requests zijn gekomen (meer dan 1 per seconde)
+    // Als er teveel requests zijn gekomen (meer dan 1 per seconde)
     elseif ($data['status']['code'] == 429) {
-      # Wacht even
+      // Wacht even
       sleep(0.5);
       return getCityByCoords($conn, $coords);
     }
-    # Als er iets anders mis is, gooi een error
+    // Als er iets anders mis is, gooi een error
     else {
       error_log("Opencage error " . $data['status']['code'] . ": " . $data['status']['message']);
       error(500, "Er ging iets fout.");
@@ -355,7 +360,7 @@ function error($code, $msg) {
  * @return Value Waarde van opgegeven parameter
  */
 function GET($parameter) {
-  # XSS preventie, better safe than sorry.
+  // XSS preventie, better safe than sorry.
   $value = trim(strip_tags($_GET[$parameter]));
   return (empty($value)) ? null : urldecode($value);
 }

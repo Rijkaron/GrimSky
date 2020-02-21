@@ -7,26 +7,26 @@ var errorInterval;
 var dataInterval;
 
 // Stel standaard instellingen in.
-if (localStorage.getItem("plaats") === null) localStorage.setItem("plaats", "Amsterdam");
-if (getSetting("ElkeXUren") === null) setSetting("ElkeXUren", 3);
-if (getSetting("temperatuurEenheid") === null) setSetting("temperatuurEenheid", '°C');
-if (getSetting("snelheidEenheid") === null) setSetting("snelheidEenheid", 'kmu');
+if (localStorage.getItem('plaats') === null) localStorage.setItem('plaats', 'Amsterdam');
+if (getSetting('ElkeXUren') === null) setSetting('ElkeXUren', 3);
+if (getSetting('temperatuurEenheid') === null) setSetting('temperatuurEenheid', '°C');
+if (getSetting('snelheidEenheid') === null) setSetting('snelheidEenheid', 'kmu');
 
 // Vue opties instellen
 var filters = {
   // Zet de temperatuur in de goede eenheid
   temperatuurEenheid: function(temperatuur) {
-    var temperatureUnit = getSetting("temperatuurEenheid").toLowerCase();
-    if (temperatureUnit == "k") return (temperatuur + 273) + "K";
-    else if (temperatureUnit == "f") return Math.round(temperatuur * 1.8 + 32) + "°F";
-    else  return (temperatuur) + "°C";
+    var temperatureUnit = getSetting('temperatuurEenheid').toLowerCase();
+    if (temperatureUnit == 'k') return (temperatuur + 273) + 'K';
+    else if (temperatureUnit == 'f') return Math.round(temperatuur * 1.8 + 32) + '°F';
+    else  return (temperatuur) + '°C';
   },
   // Zet de snelheid in de goede eenheid
   snelheidEenheid: function(snelheid) {
-    var speedUnit = getSetting("snelheidEenheid").toLowerCase();
-    if (speedUnit == "ms") return Math.round(snelheid / 3.6) + 'm/s';
-    else if (speedUnit == "mph") return Math.round(snelheid * 0.62138817810781) + 'mpu';
-    else if (speedUnit == "kt") return Math.round(snelheid * 0.5399568) + ' knopen';
+    var speedUnit = getSetting('snelheidEenheid').toLowerCase();
+    if (speedUnit == 'ms') return Math.round(snelheid / 3.6) + 'm/s';
+    else if (speedUnit == 'mph') return Math.round(snelheid * 0.62138817810781) + 'mpu';
+    else if (speedUnit == 'kt') return Math.round(snelheid * 0.5399568) + ' knopen';
     else return snelheid + 'km/u';
   },
   neerslagLevel: function(neerslagHoeveelheid) {
@@ -44,12 +44,17 @@ var filters = {
   // Zet een timestamp om in een datum (bijvoorbeeld 01-11)
   datum: function(timestamp) {
     var date = new Date(timestamp * 1000);
-    return ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2);
+    return leadingZero(date.getDate()) + '-' + leadingZero(date.getMonth() + 1);
   },
   // Zet een timestamp om in een digitale kloktijd (bijvoorbeeld 11:20)
   tijd: function(timestamp) {
     var date = new Date(timestamp * 1000);
-    return ('0' + date.getHours()).slice(-2) + 'u';
+    return leadingZero(date.getHours()) + ':' + leadingZero(date.getMinutes())
+  },
+  // Zet een timestamp om in het uur (bijvoorbeeld 19u)
+  uur: function(timestamp) {
+    var date = new Date(timestamp * 1000);
+    return leadingZero(date.getHours()) + 'u';
   },
   // Zet een timestamp om in het verschil in dagen tussen nu en de timestamp
   verschilDagen: function(timestamp) {
@@ -66,6 +71,10 @@ var filters = {
   // Krijg het pad van een weer icoontje
   path: function(image) {
     return './content/icons/weather/' + image + '.svg';
+  },
+  // Zet de eerste letter van de string als hoofdletter
+  capitalize: function(text) {
+    return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase();
   }
 }
 
@@ -73,16 +82,16 @@ var methods = {
   // Update een instelling op basis van een 'select' verander event en gooi een signaal terug naar de gebruiker
   updateSetting: function(e) {
     setSetting(e.target.dataset.setting, e.target.value);
-    $('#settingChange').css('transition', 'none');
-    $('#settingChange').css('transform', 'scale(0)');
+    $("#settingChange").css('transition', 'none');
+    $("#settingChange").css('transform', 'scale(0)');
     setTimeout(function() {
-      $('#settingChange').css('transition', 'transform 0.5s cubic-bezier(.36,.5,.63,1.47)');
-      $('#settingChange').css('transform', 'scale(1)');
+      $("#settingChange").css('transition', 'transform 0.5s cubic-bezier(0.36,0.5,0.63,1.47)');
+      $("#settingChange").css('transform', 'scale(1)');
     }, 100)
   },
   // Sluit de mobile navigatie als er op de link is geklikt
   sluitMobileNav: function() {
-    if ($('nav').hasClass('active')) toggleMobileNav();
+    if ($("nav").hasClass('active')) toggleMobileNav();
   }
 }
 
@@ -92,14 +101,14 @@ $(document).ready(function() {
 
   // Als er naast de city popup wordt geklikt of als er op de Escape knop wordt gedrukt, sluit dan de popup 
   $("body").keydown(function(e) {
-    if (e.key == "Escape" && $('#cityPopup').css('display') == "block") setPopupStatus(false);
+    if (e.key == 'Escape' && $("#cityPopup").css('display') == 'block') setPopupStatus(false);
   })
-  $('#cityPopup > div').click(function(e) { e.stopPropagation() });
-  $('#cityPopup').click(function() { setPopupStatus(false) });
+  $("#cityPopup > div").click(function(e) { e.stopPropagation() });
+  $("#cityPopup").click(function() { setPopupStatus(false) });
 
   // Als er op enter wordt gedrukt in het city input veld, probeer dan de stad te veranderen
   $("#inputPlaats").keydown(function(e) {
-    if (e.key == "Enter") setCityByInput();
+    if (e.key == 'Enter') setCityByInput();
   })
 
   // Laad de weerdata in en zet een interval om elke 10 seconden de weerdata in te laden 
@@ -115,32 +124,32 @@ function loadPage(page) {
     case 'voorspelling':
       location.hash = '#voorspelling';
       document.title = 'GrimSky | Voorspelling';
-      $('#huidig').css('display', 'none');
-      $('#voorspelling').css('display', 'block');
-      $('#instellingen').css('display', 'none');
+      $("#huidig").css('display', 'none');
+      $("#voorspelling").css('display', 'block');
+      $("#instellingen").css('display', 'none');
       break;
     case 'instellingen':
       location.hash = '#instellingen';
       document.title = 'GrimSky | Instellingen';
-      $('#huidig').css('display', 'none');
-      $('#voorspelling').css('display', 'none');
-      $('#instellingen').css('display', 'block');
+      $("#huidig").css('display', 'none');
+      $("#voorspelling").css('display', 'none');
+      $("#instellingen").css('display', 'block');
       break;
     default:
       location.hash = '#home';
       document.title = 'GrimSky | Home';
-      $('#huidig').css('display', 'block');
-      $('#voorspelling').css('display', 'none');
-      $('#instellingen').css('display', 'none');
+      $("#huidig").css('display', 'block');
+      $("#voorspelling").css('display', 'none');
+      $("#instellingen").css('display', 'none');
   }
 }
 
 // Zet de mobile header aan/uit
 function toggleMobileNav() {
-  if (!window.matchMedia("(max-width: 750px)").matches) return false;
-  var nav = $('nav');
-  var header = $('header');
-  var hamburger = $('#hamburger');
+  if (!window.matchMedia('(max-width: 750px)').matches) return false;
+  var nav = $("nav");
+  var header = $("header");
+  var hamburger = $("#hamburger");
   if (nav.hasClass('active')) {
     hamburger.removeClass('active');
     nav.removeClass('active');
@@ -158,13 +167,13 @@ function toggleMobileNav() {
 
 // Zet het laadbalkje aan/uit met eventueel een witte achtergrond
 function setLoader(status, bg = false) {
-  var loader = $('#loader');
+  var loader = $("#loader");
   if (status) {
-    loader.css("display", "block");
+    loader.css('display', 'block');
     if (bg) loader.css('background-color', 'rgb(255, 255, 255');
     else loader.css('background-color', 'unset');
   }
-  else loader.css("display", "none");
+  else loader.css('display', 'none');
 }
 
 /* Krijg de weerdata. Als het de eerste keer is, zet dan het laadbalkje aan.
@@ -174,14 +183,14 @@ function setLoader(status, bg = false) {
  */
 function loadData(first = false) {
   if (first) setLoader(true, true);
-  $.getJSON("getData.php?plaats=" + localStorage.getItem('plaats'), function(response) {
+  $.getJSON('getData.php?plaats=' + localStorage.getItem('plaats'), function(response) {
     if (response.code == 403) {
       setBruikbaar(false);
     } else if (response.code == 200) {
       setData(response);
       if (first) setLoader(false);
     } else if (first) {
-      localStorage.setItem("plaats", "Amsterdam");
+      localStorage.setItem('plaats', 'Amsterdam');
       loadData();
     } else {
       alert('Er is iets foutgegaan, probeer het later nog een keer.');
@@ -194,11 +203,12 @@ function setData(weerdata) {
   setWindspeed(weerdata.huidig.windKracht);
   setTemperature(weerdata.huidig.temperatuur);
 
-  dataSite.settings.ElkeXUren = getSetting("ElkeXUren");
-  dataSite.settings.temperatuurEenheid = getSetting("temperatuurEenheid");
-  dataSite.settings.snelheidEenheid = getSetting("snelheidEenheid");
+  dataSite.settings.ElkeXUren = getSetting('ElkeXUren');
+  dataSite.settings.temperatuurEenheid = getSetting('temperatuurEenheid');
+  dataSite.settings.snelheidEenheid = getSetting('snelheidEenheid');
 
-  dataSite.city = weerdata.plaats.split(",")[0];
+  dataSite.laatsteUpdate = weerdata.time;
+  dataSite.city = weerdata.plaats.split(',');
   dataSite.welkomBericht = getWelcomeMessage();
 
   dataSite.huidig = weerdata.huidig;
@@ -229,7 +239,7 @@ function setWindspeed(windkracht) {
 // Zet de achtergrond van de website op basis van de temperatuur
 function setTemperature(temperature) {
   var H = Math.max(10, 144 - temperature * 3.6);
-  $('#container').css('background-color', 'hsl(' + H + ', 70%, 75%)');
+  $("#container").css('background-color', 'hsl(' + H + ', 70%, 75%)');
 }
 
 // Functie geschreven door Cor :)
@@ -239,15 +249,15 @@ function getWelcomeMessage() {
   var tijdInUren = d.getHours();
 
   if (tijdInUren < 6) {
-    return "Goedenacht";
+    return 'Goedenacht';
   } else {
     if (tijdInUren < 12) {
-      return "Goedemorgen";
+      return 'Goedemorgen';
     } else {
       if (tijdInUren < 18) {
-        return "Goedemiddag";
+        return 'Goedemiddag';
       } else {
-        return "Goedenavond";
+        return 'Goedenavond';
       }
     }
   }
@@ -256,20 +266,20 @@ function getWelcomeMessage() {
 // Zet de popup om de stad in te voeren aan/uit
 function setPopupStatus(status) {
   if (status) {
-    $('#inputPlaats').val("");
-    $('#cityPopup').css("display", "block");
-    $('#inputPlaats').focus();
+    $("#inputPlaats").val('');
+    $("#cityPopup").css('display', 'block');
+    $("#inputPlaats").focus();
   } else {
-    $('#cityPopup').css("display", "none");
-    $('#krijgLocatie').removeClass("error");
-    $('#inputPlaats').removeClass("valid");
-    $('#inputPlaats').removeClass("invalid");
+    $("#cityPopup").css('display', 'none');
+    $("#krijgLocatie").removeClass('error');
+    $("#inputPlaats").removeClass('valid');
+    $("#inputPlaats").removeClass('invalid');
   }
 }
 
 // Zet de plaats van het weer aan de hand van de input van de popup
 function setCityByInput() {
-  setCity($('#inputPlaats').val(), function(success) {
+  setCity($("#inputPlaats").val(), function(success) {
     if (success) {
       setValidCity(true);
       setTimeout(function() { setPopupStatus(false) }, 500);
@@ -281,13 +291,13 @@ function setCityByInput() {
 
 // Zet de plaats van het waar aan de hand van de locatie van het IP van de gebruiker
 function getLocation() {
-  $.getJSON('http://geolocation-db.com/json/', function(response) {
+  $.getJSON('https://geolocation-db.com/json/', function(response) {
     var country = response.country_code != null ? ',' + response.country_code : '';
     setCity(response.city + country, function(success) {
       if (success) {
-        $('#krijgLocatie').removeClass("error");
+        $("#krijgLocatie").removeClass('error');
         setTimeout(function() { setPopupStatus(false) }, 500);
-      } else $('#krijgLocatie').addClass("error");
+      } else $("#krijgLocatie").addClass('error');
     })
   })
 }
@@ -296,14 +306,14 @@ function getLocation() {
 function setCity(city, callback) {
   setLoader(true, false);
 
-  $.getJSON("getData.php?plaats=" + city, function(response) {
+  $.getJSON('getData.php?plaats=' + city, function(response) {
     setLoader(false);
     // Als de response code niet 200 is OF als de response plaats overeenkomt met ',AB'
-    if (response.code != "200" || /^(,\w\w)/.test(response.plaats)) {
+    if (response.code != '200' || /^(,\w\w)/.test(response.plaats)) {
       setValidCity(false);
       callback(false);
     } else {
-      localStorage.setItem("plaats", city);
+      localStorage.setItem('plaats', city);
       setData(response);
       if (typeof callback == 'function') callback(true);
     }
@@ -313,27 +323,27 @@ function setCity(city, callback) {
 // Gooi terug naar de gebruiker of de plaats geldig is of niet.
 function setValidCity(status) {
   if (status) {
-    $('#inputPlaats').removeClass("invalid");
-    $('#inputPlaats').addClass("valid");
+    $("#inputPlaats").removeClass('invalid');
+    $("#inputPlaats").addClass('valid');
   } else {
-    $('#inputPlaats').removeClass("valid");
-    $('#inputPlaats').addClass("invalid");
+    $("#inputPlaats").removeClass('valid');
+    $("#inputPlaats").addClass('invalid');
   }
 }
 
 // Zet of de site vandaag requests kan uitvoeren naar de server
 function setBruikbaar(status) {
   if (status) {
-    $('#onbruikbaar').css('display', 'none');
-    $('body').css('overflow', 'hidden auto');
+    $("#onbruikbaar").css('display', 'none');
+    $("body").css('overflow', 'hidden auto');
     // Laad data en interval weer in
     loadData();
     dataInterval = setInterval(loadData, 10 * 1000);
   }
   else {
     clearInterval(dataInterval);
-    $('#onbruikbaar').css('display', 'flex');
-    $('body').css('overflow', 'hidden hidden');
+    $("#onbruikbaar").css('display', 'flex');
+    $("body").css('overflow', 'hidden hidden');
     // Update de timer en stel een interval in die de timer bijhoudt.
     setCooldown();
     errorInterval = setInterval(setCooldown, 1000);
@@ -352,21 +362,26 @@ function setCooldown() {
     return;
   }
 
-  var uren = ('0' + Math.floor(difference / (60 * 60))).slice(-2);
-  var min = ('0' + Math.floor((difference % (60 * 60)) / 60)).slice(-2);
-  var sec = ('0' + Math.floor(difference % 60)).slice(-2);
+  var uren = leadingZero(Math.floor(difference / (60 * 60)));
+  var min = leadingZero(Math.floor((difference % (60 * 60)) / 60));
+  var sec = leadingZero(Math.floor(difference % 60));
 
-  $('#countdown').text(uren + ':' + min + ':' + sec);
+  $("#countdown").text(uren + ':' + min + ':' + sec);
+}
+
+// Zet nullen voor een getal als dat nodig is (9 -> 09, 19 -> 19)
+function leadingZero(number) {
+  return ('0' + number).slice(-2);
 }
 
 // Krijg een instelling
 function getSetting(setting) {
-  return localStorage.getItem("setting_" + setting);
+  return localStorage.getItem('setting_' + setting);
 }
 
 // Stel een instelling in (+ update de setting in de Vue data)
 function setSetting(setting, value) {
-  localStorage.setItem("setting_" + setting, value);
+  localStorage.setItem('setting_' + setting, value);
   
   dataSite.settings[setting] = value;
 }

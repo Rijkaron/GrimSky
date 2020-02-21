@@ -1,71 +1,122 @@
-/* Import */
-
+/*
+* Import fonts
+*/
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
-/* Global */
 
+/*
+* Global settings
+*/
 :root {
   /* Grootte van de hamburger */
   --hamburger-laag-hoogte: 0.25rem;
+  font-size: 16px;
 }
 
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   font-family: 'Roboto', 'Raleway', sans-serif;
 }
 
-/* Anti-lelijke balken */
-
 body {
+  /* Anti-lelijke balken */
   overflow-x: hidden;
 }
 
-/* Header */
-
-header {
+/* Aparte container dan body voor Vue */
+#container {
   width: 100vw;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 0 calc(2vw + 2rem);
+  background-color: #ffffff;
+  z-index: -1;
+  color: rgb(255, 255, 255);
+  min-height: 100vh;
+}
+
+/*
+* Header
+*/
+header {
   position: absolute;
-  z-index: 2;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row nowrap;
+          flex-flow: row nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100vw;
   height: calc(4vh + 2rem);
+  padding: 0 calc(2vw + 2rem);
+  z-index: 2;
 }
 
 header * {
   text-decoration: none;
+  /* variabele omdat de kleur veranderd als de mobile nav aan/uit gaat */
   color: var(--color);
 }
 
 header>#logo {
   padding: 0 1rem 0 0;
   font-size: 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   height: 100%;
   color: rgb(255, 255, 255);
-  filter: opacity(0.8);
+  -webkit-filter: opacity(0.8);
+          filter: opacity(0.8);
 }
 
 header>#logo:hover, header>nav>a.instellingen:hover {
-  filter: opacity(1);
+  -webkit-filter: opacity(1);
+          filter: opacity(1);
 }
 
+/*
+* Navigation
+*/
 header>nav {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
-  align-items: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row nowrap;
+          flex-flow: row nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  /* transition voor mobile nav */
+  -webkit-transition: -webkit-transform ease-out 0.2s;
+  transition: -webkit-transform ease-out 0.2s;
+  -o-transition: transform ease-out 0.2s;
   transition: transform ease-out 0.2s;
+  transition: transform ease-out 0.2s, -webkit-transform ease-out 0.2s;
 }
 
 header>nav>a {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   border: none;
   font-size: 1.2rem;
   text-decoration: none;
@@ -77,9 +128,11 @@ header>nav>a {
 
 header>nav>a>span {
   position: relative;
+  /* De minimale ruimte onder het lijntje bij hover */
   padding-bottom: 5px;
 }
 
+/* Het lijntje onder de navigatie link bij hover */
 header>nav>a>span::before {
   content: "";
   position: absolute;
@@ -89,6 +142,8 @@ header>nav>a>span::before {
   left: 0;
   background-color: #ffffff;
   visibility: hidden;
+  -webkit-transition: bottom 0.2s ease-out;
+  -o-transition: bottom 0.2s ease-out;
   transition: bottom 0.2s ease-out;
 }
 
@@ -100,13 +155,16 @@ header>nav>a:hover>span::before {
 header>nav>a.instellingen {
   padding: 0.25rem 0.75rem;
   margin-top: 0.25rem;
-  filter: opacity(0.8);
+  -webkit-filter: opacity(0.8);
+          filter: opacity(0.8);
 }
 
+/* De tekst instellingen ipv de img. Wordt laten zien bij de mobile nav */
 header>nav>a.instellingen>span {
   display: none;
 }
 
+/* De knop waar de plaats kan worden ingevoerd */
 header>button {
   margin-right: 0;
   margin-left: auto;
@@ -116,8 +174,16 @@ header>button {
   text-transform: uppercase;
   font-size: 1.5rem;
 }
+/* Knop met dezelfde functie, maar dan voor mobiel */
+header .openPopupMobile {
+  display: none;
+}
 
-header>nav.mobile, header>div#hamburger {
+/* 
+* Hamburger
+*/
+/* Zet hamburger standaard op onzichtbaar */
+header>div#hamburger {
   display: none;
 }
 
@@ -125,13 +191,18 @@ header>nav.mobile, header>div#hamburger {
   width: calc(var(--hamburger-laag-hoogte) * 6.6);
   height: calc(var(--hamburger-laag-hoogte) * 5);
   position: relative;
-  transform: rotate(0deg);
+  -webkit-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
   margin-right: 0;
   margin-left: auto;
 }
 
+/* Hamburger balken */
 #hamburger>span {
   display: block;
   position: absolute;
@@ -141,32 +212,30 @@ header>nav.mobile, header>div#hamburger {
   border-radius: var(--hamburger-laag-hoogte);
   opacity: 1;
   left: 0;
-  transform: rotate(0deg);
+  -webkit-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+  -webkit-transition: 0.2s ease-in-out;
+  -o-transition: 0.2s ease-in-out;
   transition: 0.2s ease-in-out;
 }
 
-#hamburger>span:nth-child(1) {
-  top: 0;
-}
+#hamburger>span:nth-child(1) { top: 0 }
+#hamburger>span:nth-child(2) { top: calc(var(--hamburger-laag-hoogte) * 2) }
+#hamburger>span:nth-child(3) { top: calc(var(--hamburger-laag-hoogte) * 2) }
+#hamburger>span:nth-child(4) { top: calc(var(--hamburger-laag-hoogte) * 4) }
 
-#hamburger>span:nth-child(2) {
-  top: calc(var(--hamburger-laag-hoogte) * 2);
-}
-
-#hamburger>span:nth-child(3) {
-  top: calc(var(--hamburger-laag-hoogte) * 2);
-}
-
-#hamburger>span:nth-child(4) {
-  top: calc(var(--hamburger-laag-hoogte) * 4);
-}
-
+/* Als hamburger actief is, draai balken naar een kruis */
 #hamburger.active>span:nth-child(2) {
-  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
 }
 
 #hamburger.active>span:nth-child(3) {
-  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+          transform: rotate(-45deg);
 }
 
 #hamburger.active>span:nth-child(1), #hamburger.active>span:nth-child(4) {
@@ -175,111 +244,79 @@ header>nav.mobile, header>div#hamburger {
   left: 50%;
 }
 
-header .openPopupMobile {
-  display: none;
+/* 
+* Algemene styling voor de blokken op de pagina's
+*/
+article fieldset {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  color: #000000;
+  padding: 0.5rem 1rem;
+  margin: 2rem 0;
 }
 
-#container {
-  width: 100vw;
-  background-color: #ffffff;
-  z-index: -1;
-  color: rgb(255, 255, 255);
-  min-height: 100vh;
+article legend {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 0.1rem 0.75rem;
+  font-size: 2rem;
+  margin: 0 1rem;
+  color: #000000;
 }
 
-/* Frontpage container */
+article fieldset p {
+  margin-top: 0.75rem;
+}
 
+article fieldset a {
+  font-size: 1rem;
+  color: black;
+  -webkit-text-decoration: underline #000000;
+          text-decoration: underline #000000;
+}
+
+article:not(#huidig) {
+  padding: 7rem 15vw;
+}
+
+/*
+* De frontpage
+*/
 #frontpage {
+  /* Laat de container over de browser window strekken */
   height: 100vh;
   width: 100vw;
   position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
   z-index: 1;
 }
 
+/* Laatst geupdate */
+#frontpage>p {
+  position: absolute;
+  bottom: 10px;
+  right: 30px;
+  font-size: 1.1rem;
+}
+
+/* Windmolen op de frontpage */
 #windmolen-container {
   position: absolute;
   bottom: 0;
   left: 10vw;
-}
-
-#windmolen-container {
   text-align: center;
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
 }
-
-/* Welkom */
-
-#welkom-container {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 15rem;
-  width: 25rem;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-}
-
-#welkom-container>img {
-  filter: opacity(0.9);
-}
-
-#welkom-container>p {
-  margin-top: -1rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 2rem;
-  text-align: center;
-  white-space: nowrap;
-}
-
-#welkom-container>p>span {
-  font-size: 3rem;
-}
-
-#welkom-container>p>b {
-  font-weight: 400;
-  font-size: 125%;
-}
-
-a#scroll {
-  width: 3rem;
-  height: 5rem;
-}
-
-a#scroll>span {
-  bottom: 1rem;
-  position: absolute;
-  left: 50%;
-  width: 35px;
-  height: 35px;
-  margin-left: calc(-0.5 * 35px);
-  border-right: 3px solid rgb(255, 255, 255);
-  border-bottom: 3px solid rgb(255, 255, 255);
-  border-radius: 3px;
-  transform: rotate(45deg);
-  animation: move-up-and-down 2s ease-out infinite;
-}
-
-@keyframes move-up-and-down {
-  0% {
-    bottom: 3rem;
-    opacity: 0;
-  }
-  40%, 60% {
-    opacity: 1;
-  }
-  100% {
-    bottom: 1rem;
-    opacity: 0;
-  }
-}
-
-/* Windmolen */
 
 #windmolen {
   width: 300px;
@@ -292,6 +329,8 @@ a#scroll>span {
   position: absolute;
   width: 10px;
   height: 200px;
+  background: -webkit-gradient(linear, left bottom, left top, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0.6)));
+  background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%);
   background: linear-gradient(to top, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%);
   bottom: 0px;
   left: 145px;
@@ -301,28 +340,35 @@ a#scroll>span {
   position: absolute;
   width: 20px;
   height: 20px;
+  background: -webkit-gradient(linear, left bottom, left top, from(rgba(255, 255, 255, 0.6)), to(rgba(255, 255, 255, 0.5)));
+  background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.5) 100%);
   background: linear-gradient(to top, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.5) 100%);
   bottom: 200px;
   left: 140px;
 }
 
+/* De wieken van de windmolen */
 #windmolen-wieken {
   width: 200px;
   height: 200px;
   position: absolute;
   top: 40px;
   left: 50px;
-  animation: spin 2s linear infinite;
+  -webkit-animation: spin 2s linear infinite;
+          animation: spin 2s linear infinite;
 }
 
 #windmolen-wieken>* {
   width: 5px;
   height: 120px;
   position: absolute;
+  background: -webkit-gradient(linear, left bottom, left top, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0.6)));
+  background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%);
   background: linear-gradient(to top, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%);
   border-top-right-radius: 5px 20px;
 }
 
+/* De wieken zelf */
 #windmolen-wieken>*:nth-child(1) {
   top: -20px;
   left: 97px;
@@ -331,15 +377,556 @@ a#scroll>span {
 #windmolen-wieken>*:nth-child(2) {
   top: 70px;
   left: 150px;
-  transform: rotate(120deg);
+  -webkit-transform: rotate(120deg);
+      -ms-transform: rotate(120deg);
+          transform: rotate(120deg);
 }
 
 #windmolen-wieken>*:nth-child(3) {
   top: 70px;
   left: 45px;
-  transform: rotate(240deg);
+  -webkit-transform: rotate(240deg);
+      -ms-transform: rotate(240deg);
+          transform: rotate(240deg);
 }
 
+/* Welkom bericht op de frontpage */
+#welkom-container {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
+  height: 15rem;
+  width: 25rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#welkom-container>img {
+  /* Laat achtergrondkleur een beetje doorschijnen */
+  -webkit-filter: opacity(0.9);
+          filter: opacity(0.9);
+}
+
+#welkom-container>p {
+  margin-top: -1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 2rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Span voor het welkomstbericht zelf */
+#welkom-container>p>span {
+  font-size: 3rem;
+}
+
+/* Style voor de temperatuur in het welkomstbericht */
+#welkom-container>p>b {
+  font-weight: 400;
+  font-size: 125%;
+}
+
+/* 
+* De link die de gebruiker laat zien dat hij naar beneden kan scrollen
+*/ 
+a#scroll {
+  width: 3rem;
+  height: 5rem;
+}
+
+/* De pijl zelf */
+a#scroll>span {
+  bottom: 1rem;
+  position: absolute;
+  left: 50%;
+  width: 35px;
+  height: 35px;
+  margin-left: calc(-0.5 * 35px);
+  border-right: 3px solid rgb(255, 255, 255);
+  border-bottom: 3px solid rgb(255, 255, 255);
+  border-radius: 3px;
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+  -webkit-animation: move-up-and-down 2s ease-out infinite;
+          animation: move-up-and-down 2s ease-out infinite;
+}
+
+/* 
+* Korte weersvoorspelling op de huidig weer pagina
+*/
+#meerWeer {
+  border-top: 10px solid rgba(255, 255, 255, 0.75);
+  padding: 0 10vw;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+#meerWeer>div {
+  width: 65%;
+}
+
+#weerVandaag, #weerMorgen {
+  width: 100%;
+}
+
+/* Weerradar van Buienradar */
+#weerRadar {
+  width: 30%;
+  /* Anders trekt hij zichzelf te ver door */
+  -ms-flex-item-align: start;
+      align-self: flex-start;
+}
+
+#weerRadar img {
+  width: 100%;
+  -o-object-fit: contain;
+    object-fit: contain;
+}
+
+h3 {
+  font-weight: 400;
+}
+
+/* Styling voor de korte voorspelling op de huidig weer pagina */
+h4 {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+h4 span {
+  padding: 0.1rem 1rem;
+  display: inline;
+  border-bottom: 1px solid #6d6d6d;
+}
+
+.voorspellingIcons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  margin: 1rem 0;
+  font-size: 1.1rem
+}
+
+.voorspellingIcons>div {
+  text-align: center;
+  margin: 0.3rem;
+}
+
+.voorspellingIcons>div>img {
+  width: 2rem;
+}
+
+.voorspellingIcons>div>span {
+  display: inline;
+}
+
+/* Informatie icoontje voor tooltip */
+.voorspellingIcons>div>span>img {
+  vertical-align: top;
+  width: 0.75vw;
+}
+
+/* 
+* Tooltips
+*/
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted rgb(255, 255, 255);
+}
+
+.tooltip:hover::after {
+  /* Krijg de tekst van de tooltip uit het html element */
+  content: attr(data-tooltip);
+  width: 20rem;
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  border-radius: 6px;
+  padding: 0.5rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 250%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
+  white-space: pre-wrap;
+  margin-left: 2rem;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.tooltip:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 200%;
+  left: 50%;
+  margin-left: -5px;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+/* Dagenvoorspelling */
+#voorspellingDagen {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  margin: 0 auto;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+#voorspellingDagen>div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  color: #040f3d;
+  padding: 1rem;
+  max-width: 10vw;
+  min-width: 9rem;
+}
+
+#voorspellingDagen>div>* {
+  width: 100%;
+}
+
+/* Container voor min- en maxtemperatuur. Bij mobiel gaan ze in een row */
+#voorspellingDagen>div>div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  width: 100%;
+}
+
+/* Icoontje met wat het weer die dag zal worden */
+#voorspellingDagen>div>img {
+  width: 60%;
+  -webkit-filter: brightness(0.4);
+          filter: brightness(0.4);
+}
+
+#voorspellingDagen>div>.dag, #voorspellingDagen>div>.datum {
+  font-size: 1.4rem;
+}
+
+#voorspellingDagen>div>.datum, #voorspellingDagen>div>.korteDatum {
+  text-align: center;
+  border-bottom: 1px solid #7b7b7b;
+  margin-bottom: 0.5rem;
+}
+/* Standaardinstellingen voor de icoontjes in de dagenvoorspelling */
+#voorspellingDagen p.item:before {
+  content: '';
+  height: 1rem;
+  width: 1rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  left: -1.25rem;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+/* Geef de temperatuuricoontjes in de dagenvoorspelling het goede plaatje + dimensies */
+#voorspellingDagen p.item[class$=Temperature]:before {
+  height: 1.25rem;
+  width: 1.25rem;
+  background-image: url('./icons/thermometer.svg');
+}
+
+/* Icoontjes bij de dagenvoorspelling */
+#voorspellingDagen p.neerslagKans:before { background-image: url('./icons/percent.svg') }
+#voorspellingDagen p.neerslagHoeveelheid:before { background-image: url('./icons/waterdrop.svg') }
+#voorspellingDagen p.item.wind:before { background-image: url('./icons/wind.svg') }
+
+/* Filters door de generator van Barrett Sonntag. Maken de zwarte thermometers een kleur. */
+#voorspellingDagen p.minTemperature:before {
+  /* Blauw */
+  -webkit-filter: invert(34%) sepia(83%) saturate(2912%) hue-rotate(198deg) brightness(96%) contrast(115%);
+          filter: invert(34%) sepia(83%) saturate(2912%) hue-rotate(198deg) brightness(96%) contrast(115%);
+}
+
+#voorspellingDagen p.maxTemperature:before {
+  /* Rood */
+  -webkit-filter: invert(48%) sepia(47%) saturate(6252%) hue-rotate(339deg) brightness(95%) contrast(91%);
+          filter: invert(48%) sepia(47%) saturate(6252%) hue-rotate(339deg) brightness(95%) contrast(91%);
+}
+
+/* Korte datum voor mobiel */
+#voorspellingDagen>div>.korteDatum {
+  font-size: 1.2rem;
+  display: none;
+}
+
+#voorspellingDagen>div .item {
+  font-size: 1.15rem;
+  text-align: left;
+  position: relative;
+}
+
+fieldset#voorspellingDagen>div p {
+  margin-top: 0;
+}
+
+#voorspellingUren {
+  margin: 2rem auto;
+}
+
+/* Zet tip om te scrollen uit voor desktop */
+#voorspellingUren>.scrollTip {
+  font-family: 'Raleway', sans-serif;
+  display: none;
+}
+
+#voorspellingUren>div {
+  overflow: scroll hidden;
+  white-space: nowrap;
+  width: calc(70vw - 2rem);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row nowrap;
+          flex-flow: row nowrap;
+}
+
+#voorspellingUren>div>div {
+  text-align: center;
+  color: #040f3d;
+  padding: 0.5rem;
+  min-width: 3.5rem;
+}
+
+#voorspellingUren>div>div>img {
+  width: 100%;
+  font-size: 0.8rem;
+  -webkit-filter: brightness(0.4);
+          filter: brightness(0.4);
+}
+
+#voorspellingUren>div>div>img.neerslag {
+  width: 60%;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  margin-bottom: -0.5rem;
+}
+
+/* Filters door de generator van Barrett Sonntag. Maken van de zwarte regendruppel een kleur die past bij de hoeveelheid regen */
+#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="0"] {
+  /* Groen */
+  -webkit-filter: invert(65%) sepia(98%) saturate(358%) hue-rotate(93deg) brightness(90%) contrast(86%);
+          filter: invert(65%) sepia(98%) saturate(358%) hue-rotate(93deg) brightness(90%) contrast(86%);
+}
+
+#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="1"] {
+  /* Geel */
+  -webkit-filter: invert(91%) sepia(75%) saturate(732%) hue-rotate(332deg) brightness(102%) contrast(105%);
+          filter: invert(91%) sepia(75%) saturate(732%) hue-rotate(332deg) brightness(102%) contrast(105%);
+}
+
+#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="2"] {
+  /* Oranje */
+  -webkit-filter: invert(76%) sepia(46%) saturate(6240%) hue-rotate(349deg) brightness(92%) contrast(97%);
+          filter: invert(76%) sepia(46%) saturate(6240%) hue-rotate(349deg) brightness(92%) contrast(97%);
+}
+
+#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="3"] {
+  /* Rood */
+  -webkit-filter: invert(20%) sepia(92%) saturate(3660%) hue-rotate(353deg) brightness(92%) contrast(84%);
+          filter: invert(20%) sepia(92%) saturate(3660%) hue-rotate(353deg) brightness(92%) contrast(84%);
+}
+
+/* Zet een randje tussen de uren als de dag anders is */
+#voorspellingUren>div>div[data-verschildagen="1"]~div[data-verschildagen="1"] {
+  border-left: none;
+}
+#voorspellingUren>div>div[data-verschildagen="1"] {
+  border-left: 1px solid #6e6e6e;
+}
+
+#voorspellingUren>div>div[data-verschildagen="2"]~div[data-verschildagen="2"] {
+  border-left: none;
+}
+#voorspellingUren>div>div[data-verschildagen="2"] {
+  border-left: 1px solid #6e6e6e;
+}
+
+#voorspellingUren>div>div>.tijd {
+  text-align: center;
+  width: 100%;
+  border-bottom: 1px solid #6e6e6e;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #6e6e6e;
+}
+
+/* Voorspellinguren */
+#voorspellingUren>div>div>.item {
+  font-size: 1rem;
+  width: 100%;
+  position: relative;
+}
+
+/* Het windrichtingplaatje bij de uursvoorspelling */
+#voorspellingUren div>.wind {
+  background-image: url(./icons/windrichting.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 0.5rem;
+  background-size: contain;
+  width: 100%;
+  line-height: 3rem;
+}
+
+/* Instellingen pagina */
+article#instellingen fieldset {
+  padding: 0.75rem 1.5rem;
+}
+
+/* Styling voor select elements */
+.conSelect {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  width: 200px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.conSelect:last-child {
+  margin-bottom: 0.5rem;
+}
+
+.conSelect>select {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background-color: #eee;
+  color: #777777;
+  /* Zet het standaard pijltje van de browser uit */
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  font-size: 0.9rem;
+}
+
+.conSelect>div {
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  right: 1rem;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  border-style: solid;
+  border-width: 8px 5px 0 5px;
+  border-color: #777777 transparent transparent transparent;
+}
+
+fieldset #settingChange {
+  color: #2ecc71;
+  display: inline-block;
+  margin: 0.5rem 0 0.5rem 1rem;
+  border: 1px solid #2ecc71;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+}
+
+/*
+* Footer
+*/
+footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+     -ms-flex-pack: justify;
+   justify-content: space-between;
+  background-color: #ffffff;
+  color: #040f3d;
+  padding: 1rem 10vw;
+  -webkit-box-align: center;
+     -ms-flex-align: center;
+        align-items: center;
+}
+
+footer>strong {
+  font-size: calc(1rem + 1vh);
+  font-weight: 400;
+  font-family: 'Raleway', sans-serif;
+  letter-spacing: 1px;
+}
+
+footer>p {
+  text-align: right;
+  font-size: 1rem;
+}
+
+/*
+* De popup waar de gebruiker de plaats kan invoeren
+*/
 #cityPopup {
   position: fixed;
   width: 100%;
@@ -354,15 +941,25 @@ a#scroll>span {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
   text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   width: calc(15vw + 10rem);
   background-color: rgb(235, 235, 241);
   padding: 2rem;
-  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
 }
 
 #cityPopup>div>input {
@@ -390,489 +987,9 @@ a#scroll>span {
   margin-bottom: 0px;
 }
 
-#cityPopup>div>input+p, #cityPopup>div>button+p {
-  display: none;
-}
-
-#cityPopup>div>input.invalid+p, #cityPopup>div>button.error+p {
-  display: block;
-  margin-top: 0.5rem;
-  color: #e74c3c;
-}
-
-#cityPopup>div>div {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-#cityPopup button {
-  height: 2rem;
-  width: 30%;
-  color: rgb(255, 255, 255);
-  border: none;
-  cursor: pointer;
-}
-
-#cityPopup button:hover, #cityPopup button:active {
-  filter: saturate(1.25);
-}
-
-#cityPopup .annuleren {
-  background-color: #e74c3c;
-}
-
-#cityPopup .bevestigen {
-  background-color: #2ecc71;
-}
-
-#loader {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  z-index: 98;
-}
-
-#loader span {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  margin: -3rem 0 0 -3rem;
-  z-index: 99;
-  height: 6rem;
-  width: 6rem;
-  animation: spin 1s cubic-bezier(0.6, 0.2, 0.6, 0.8) infinite;
-  border: 5px solid #8f8f8f;
-  border-top: 5px solid #dddddd;
-  border-radius: 50%;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-article fieldset {
-  border: none;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  color: #000000;
-  padding: 0.5rem 1rem;
-  margin: 2rem 0;
-}
-
-article#instellingen fieldset {
-  padding: 0.75rem 1.5rem;
-}
-
-article legend {
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 0.1rem 0.75rem;
-  font-size: 2rem;
-  margin: 0 1rem;
-  color: #000000;
-}
-
-#meerWeer {
-  border-top: 10px solid rgba(255, 255, 255, 0.75);
-  padding: 0 10vw;
-  margin: 0 auto;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-between;
-}
-
-#meerWeer>div {
-  width: 65%;
-}
-
-#weerVandaag, #weerMorgen {
+#cityPopup #krijgLocatie {
   width: 100%;
-}
-
-#weerRadar {
-  width: 30%;
-  align-self: flex-start;
-}
-
-#weerRadar img {
-  width: 100%;
-  object-fit: contain;
-}
-
-h3 {
-  font-weight: 400;
-}
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted rgb(255, 255, 255);
-}
-
-.tooltip:hover::after {
-  content: attr(data-tooltip);
-  width: 20rem;
-  background-color: rgb(0, 0, 0);
-  color: rgb(255, 255, 255);
-  border-radius: 6px;
-  padding: 0.5rem;
-  position: absolute;
-  z-index: 1;
-  bottom: 250%;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: pre-wrap;
-  margin-left: 2rem;
-  text-align: left;
-}
-
-.tooltip:hover::before {
-  content: "";
-  position: absolute;
-  bottom: 200%;
-  left: 50%;
-  margin-left: -5px;
-  margin-top: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: black transparent transparent transparent;
-}
-
-.voorspellingIcons {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-around;
-  margin: 1rem 0;
-}
-
-h4 {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 400;
-}
-
-h4 span {
-  padding: 0.1rem 1rem;
-  display: inline;
-  border-bottom: 1px solid #6d6d6d;
-}
-
-.voorspellingIcons>div {
-  text-align: center;
-  margin: 0.3rem;
-}
-
-.voorspellingIcons>div>img {
-  width: 2rem;
-}
-
-.voorspellingIcons>div>span {
-  display: inline;
-}
-
-.voorspellingIcons>div>span>img {
-  vertical-align: top;
-  width: 0.75vw;
-}
-
-article fieldset p {
-  margin-top: 0.75rem;
-}
-
-article fieldset a {
-  font-size: 1rem;
-  color: black;
-  text-decoration: underline #000000;
-}
-
-footer {
-  display: flex;
-  justify-content: space-between;
-  background-color: #ffffff;
-  color: #040f3d;
-  padding: 1rem 10vw;
-  align-items: center;
-}
-
-footer>strong {
-  font-size: calc(1rem + 1vh);
-  font-weight: 400;
-  font-family: 'Raleway', sans-serif;
-  letter-spacing: 1px;
-}
-
-footer>p {
-  text-align: right;
-  font-size: 1rem;
-}
-
-article:not(#huidig) {
-  padding: 7rem 15vw;
-}
-
-#voorspellingDagen {
-  display: flex;
-  flex-flow: row wrap;
-  margin: 0 auto;
-  justify-content: center;
-}
-
-#voorspellingDagen>div {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-end;
-  align-items: center;
-  flex: 1;
-  color: #040f3d;
-  padding: 1rem;
-  max-width: 10vw;
-  min-width: 9rem;
-}
-
-#voorspellingDagen>div>* {
-  width: 100%;
-}
-
-#voorspellingDagen>div>div {
-  display: flex;
-  justify-content: space-between;
-  flex-flow: column nowrap;
-  width: 100%;
-}
-
-#voorspellingDagen>div>img {
-  width: 60%;
-  filter: brightness(0.4);
-}
-
-#voorspellingDagen>div>.dag, #voorspellingDagen>div>.datum {
-  font-size: 1.4rem;
-}
-
-#voorspellingDagen>div>.datum, #voorspellingDagen>div>.korteDatum {
-  text-align: center;
-  border-bottom: 1px solid #7b7b7b;
-  margin-bottom: 0.5rem;
-}
-
-#voorspellingDagen>div>.korteDatum {
-  font-size: 1.2rem;
-  display: none;
-}
-
-#voorspellingDagen>div .item {
-  font-size: 1.15rem;
-  text-align: left;
-  position: relative;
-}
-
-fieldset#voorspellingDagen>div p {
-  margin-top: 0;
-}
-
-#voorspellingUren {
-  margin: 2rem auto;
-}
-
-#voorspellingUren>div {
-  overflow: scroll hidden;
-  white-space: nowrap;
-  width: calc(70vw - 2rem);
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-#voorspellingUren>div>div {
-  text-align: center;
-  color: #040f3d;
-  padding: 0.5rem;
-  min-width: 3.5rem;
-}
-
-#voorspellingUren>div>div>img {
-  width: 100%;
-  font-size: 0.8rem;
-  filter: brightness(0.4);
-}
-
-#voorspellingUren>div>div>img.neerslag {
-  width: 60%;
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
-  margin-bottom: -0.5rem;
-}
-
-/* Filters door Barrett Sonntag */
-
-#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="0"] {
-  filter: invert(65%) sepia(98%) saturate(358%) hue-rotate(93deg) brightness(90%) contrast(86%);
-}
-
-#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="1"] {
-  filter: invert(91%) sepia(75%) saturate(732%) hue-rotate(332deg) brightness(102%) contrast(105%);
-}
-
-#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="2"] {
-  filter: invert(76%) sepia(46%) saturate(6240%) hue-rotate(349deg) brightness(92%) contrast(97%);
-}
-
-#voorspellingUren>div>div>img.neerslag[data-neerslagLevel="3"] {
-  filter: invert(20%) sepia(92%) saturate(3660%) hue-rotate(353deg) brightness(92%) contrast(84%);
-}
-
-/* Zet een randje tussen verschillende dagen */
-
-#voorspellingUren>div>div[data-verschildagen="1"]~div[data-verschildagen="1"] {
-  border-left: none;
-}
-
-#voorspellingUren>div>div[data-verschildagen="1"] {
-  border-left: 1px solid #6e6e6e;
-}
-
-#voorspellingUren>div>div[data-verschildagen="2"]~div[data-verschildagen="2"] {
-  border-left: none;
-}
-
-#voorspellingUren>div>div[data-verschildagen="2"] {
-  border-left: 1px solid #6e6e6e;
-}
-
-#voorspellingUren>div>div>.tijd {
-  text-align: center;
-  width: 100%;
-  border-bottom: 1px solid #6e6e6e;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  color: #6e6e6e;
-}
-
-#voorspellingUren>div>div>.item {
-  font-size: 1rem;
-  width: 100%;
-  position: relative;
-}
-
-#voorspellingDagen p.item:before {
-  content: '';
-  height: 1rem;
-  width: 1rem;
-  background-repeat: no-repeat;
-  background-size: contain;
-  position: absolute;
-  left: -1.25rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#voorspellingDagen p.item[class$=Temperature]:before {
-  height: 1.25rem;
-  width: 1.25rem;
-  background-image: url('./icons/thermometer.svg');
-}
-
-#voorspellingDagen p.neerslagKans:before {
-  background-image: url('./icons/percent.svg');
-}
-
-#voorspellingDagen p.neerslagHoeveelheid:before {
-  background-image: url('./icons/waterdrop.svg');
-}
-
-#voorspellingDagen p.item.wind:before {
-  background-image: url('./icons/wind.svg');
-}
-
-#voorspellingDagen p.minTemperature:before {
-  filter: invert(34%) sepia(83%) saturate(2912%) hue-rotate(198deg) brightness(96%) contrast(115%);
-}
-
-#voorspellingDagen p.maxTemperature:before {
-  filter: invert(48%) sepia(47%) saturate(6252%) hue-rotate(339deg) brightness(95%) contrast(91%);
-}
-
-#voorspellingUren div>.wind {
-  background-image: url(./icons/windrichting.svg);
-  background-repeat: no-repeat;
-  background-position: center;
-  margin-top: 0.5rem;
-  background-size: contain;
-  width: 100%;
-  line-height: 3rem;
-}
-
-#onbruikbaar {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  top: 0;
-  left: 0;
-  background-color: hsl(0, 70%, 75%);
-  color: white;
-  justify-content: center;
-  text-align: center;
-  flex-flow: column nowrap;
-}
-
-#onbruikbaar h1 {
-  margin-top: -3rem;
-  font-family: 'Raleway', sans-serif;
-  font-size: 1.5rem;
-}
-
-#onbruikbaar #countdown {
-  font-size: 6rem;
-}
-
-#settings>table {
-  width: 100%;
-}
-
-.conSelect {
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  width: 200px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.conSelect:last-child {
-  margin-bottom: 0.5rem;
-}
-
-.conSelect>select {
-  width: 100%;
-  padding: 0.25rem 0.5rem;
-  border: none;
-  background-color: #eee;
-  color: #777777;
-  appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  font-size: 0.9rem;
-}
-
-.conSelect>div {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 1rem;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  border-style: solid;
-  border-width: 8px 5px 0 5px;
-  border-color: #777777 transparent transparent transparent;
+  background-color: #0077FF;
 }
 
 #cityPopup fieldset {
@@ -888,35 +1005,136 @@ fieldset#voorspellingDagen>div p {
   color: rgb(140, 140, 140);
 }
 
-#cityPopup #krijgLocatie {
+/* Bericht met Plaats niet gevonden, error met ophalen van locatie. Standaard hidden */
+#cityPopup>div>input+p, #cityPopup>div>button+p {
+  display: none;
+}
+
+/* Als het element voor het bericht een class heeft met dat het niet klopt, laat het bericht dan zien */
+#cityPopup>div>input.invalid+p, #cityPopup>div>button.error+p {
+  display: block;
+  margin-top: 0.5rem;
+  color: #e74c3c;
+}
+
+/* Container met de knoppen 'Bevestigen' en 'Annuleren' */
+#cityPopup>div>div {
+  margin-top: 1rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+     -ms-flex-pack: justify;
+   justify-content: space-between;
+}
+
+#cityPopup button {
+  height: 2rem;
+  width: 30%;
+  color: rgb(255, 255, 255);
+  border: none;
+  cursor: pointer;
+}
+
+/* hover effect voor de buttons in citypopup */
+#cityPopup button:hover, #cityPopup button:active { -webkit-filter: saturate(1.25); filter: saturate(1.25) }
+
+#cityPopup .annuleren { background-color: #e74c3c }
+#cityPopup .bevestigen { background-color: #2ecc71 }
+
+/* 
+* Pagina met het bericht dat GrimSky vandaag niet meer gebruikt kan worden (door ratelimiting van de weer API)
+*/
+#onbruikbaar {
+  position: fixed;
   width: 100%;
-  background-color: #0077FF;
+  height: 100%;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  background-color: hsl(0, 70%, 75%);
+  color: white;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  text-align: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
 }
 
-fieldset #settingChange {
-  color: #2ecc71;
-  display: inline-block;
-  margin: 0.5rem 0 0.5rem 1rem;
-  border: 1px solid #2ecc71;
-  padding: 0.25rem 0.5rem;
-  border-radius: 10px;
+#onbruikbaar h1 {
+  margin-top: -3rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.5rem;
 }
 
-@media only screen and (max-width: 750px) {
+#onbruikbaar #countdown {
+  font-size: 6rem;
+}
+
+/*
+* Laadbalk voor het inladen van de gegevens
+*/
+#loader {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 98;
+}
+
+#loader span {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: -3rem 0 0 -3rem;
+  z-index: 99;
+  height: 6rem;
+  width: 6rem;
+  /* Geeft een interessante draai aan de loader */
+  -webkit-animation: spin 1s cubic-bezier(0.6, 0.2, 0.6, 0.8) infinite;
+          animation: spin 1s cubic-bezier(0.6, 0.2, 0.6, 0.8) infinite;
+  border: 5px solid #8f8f8f;
+  border-top: 5px solid #dddddd;
+  border-radius: 50%;
+}
+
+/*
+* Mobile styling
+*/
+@media only screen and (max-width: 750px) {  
+  header>button.openPopup, header>nav>.instellingen>img, #voorspellingDagen>div>.dag,
+  #voorspellingDagen>div>.datum, #windmolen-container, .voorspellingIcons>div>span.tooltip {
+    display: none;
+  }
+  header>nav>.openPopupMobile {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+  #voorspellingDagen>div>.korteDatum, header>div#hamburger, header>nav>a.instellingen>span, #voorspellingUren>.scrollTip {
+    display: block;
+  }
+
   article:not(#huidig) {
     padding: 5rem 0;
   }
+
   #voorspellingUren>div {
     width: calc(100vw - 2rem);
   }
-  header>button.openPopup, header>nav>.instellingen>img {
-    display: none;
-  }
+  
+  /* Mobile navigatie */
   header>nav {
     display: block;
     position: absolute;
-    transform: scaleY(0);
-    transform-origin: top;
+    -webkit-transform: scaleY(0);
+        -ms-transform: scaleY(0);
+            transform: scaleY(0);
+    -webkit-transform-origin: top;
+        -ms-transform-origin: top;
+            transform-origin: top;
     width: 100vw;
     background-color: #fff;
     left: 0;
@@ -926,7 +1144,8 @@ fieldset #settingChange {
   header>nav>a.instellingen, header>nav>a {
     padding: 0.4rem 0.75rem;
     margin-top: 0.5rem;
-    filter: none;
+    -webkit-filter: none;
+            filter: none;
     height: unset;
   }
   header>nav>a>span {
@@ -935,45 +1154,100 @@ fieldset #settingChange {
   header>nav>a:not(:first-child) {
     margin-top: 0;
   }
+  /* Klapt mobile nav uit */
   header>nav.active {
-    transform: scaleY(1);
+    -webkit-transform: scaleY(1);
+        -ms-transform: scaleY(1);
+            transform: scaleY(1);
   }
-  header>div#hamburger, header>nav>a.instellingen>span {
-    display: block;
+  
+  #meerWeer {
+    padding: 0;
   }
+  
+  #meerWeer>div, #meerWeer #weerRadar {
+    width: 100%;
+    margin-top: 0;
+  }
+  
+  /* Laat de legend z'n legend eigenschappen verliezen en laat hem gewoon in de fieldset komen als normale tekst */
   article legend {
     background: none;
     margin: 0 0 0.5rem;
     float: left;
     width: 100%;
   }
+  
   #voorspellingDagen>div {
     padding: 0 1rem;
   }
-  #voorspellingDagen>div>.dag, #voorspellingDagen>div>.datum, #windmolen-container, .voorspellingIcons>div>span.tooltip {
-    display: none;
-  }
-  header>nav>.openPopupMobile {
-    display: flex;
-  }
-  #voorspellingDagen>div>.korteDatum {
-    display: block;
-  }
+  
   #voorspellingDagen>div>div {
-    flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
   }
-  #meerWeer {
-    padding: 0;
-  }
-  #meerWeer>div, #meerWeer #weerRadar {
-    width: 100%;
-    margin-top: 0;
-  }
+
   #cityPopup>div {
     width: 80%;
   }
+  
   #cityPopup button {
     padding: 0 1rem;
     width: unset;
+  }
+}
+
+/*
+* Keyframes
+*/
+/* Ronddraaien */
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+/* Beweeg het element van boven naar beneden */
+@-webkit-keyframes move-up-and-down {
+  0% {
+    bottom: 3rem;
+    opacity: 0;
+  }
+  40%, 60% {
+    opacity: 1;
+  }
+  100% {
+    bottom: 1rem;
+    opacity: 0;
+  }
+}
+@keyframes move-up-and-down {
+  0% {
+    bottom: 3rem;
+    opacity: 0;
+  }
+  40%, 60% {
+    opacity: 1;
+  }
+  100% {
+    bottom: 1rem;
+    opacity: 0;
   }
 }
