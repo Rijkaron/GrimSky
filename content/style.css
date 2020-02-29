@@ -10,6 +10,7 @@
 :root {
   /* Grootte van de hamburger */
   --hamburger-laag-hoogte: 0.25rem;
+  /* De waarde die alle lengtes en breedtes bepaald */
   font-size: 16px;
 }
 
@@ -29,7 +30,8 @@ body {
 /* Aparte container dan body voor Vue */
 #container {
   width: 100vw;
-  background-color: #ffffff;
+  /* Fallback color als de achtergrondtemperatuur niet goed werkt */
+  background-color: #aea6a6;
   z-index: -1;
   color: rgb(255, 255, 255);
   min-height: 100vh;
@@ -51,7 +53,7 @@ header {
       -ms-flex-align: center;
           align-items: center;
   width: 100vw;
-  height: calc(4vh + 2rem);
+  height: calc(4.5vh + 2.5rem);
   padding: 0 calc(2vw + 2rem);
   z-index: 2;
 }
@@ -72,7 +74,6 @@ header>#logo {
       -ms-flex-align: center;
           align-items: center;
   height: 100%;
-  color: rgb(255, 255, 255);
   -webkit-filter: opacity(0.8);
           filter: opacity(0.8);
 }
@@ -120,7 +121,6 @@ header>nav>a {
   border: none;
   font-size: 1.2rem;
   text-decoration: none;
-  color: rgb(255, 255, 255);
   padding: 0.4rem 0.75rem;
   margin-top: 0.5rem;
   height: 2rem;
@@ -663,6 +663,7 @@ h4 span {
 
 #voorspellingDagen>div>.dag, #voorspellingDagen>div>.datum {
   font-size: 1.4rem;
+  text-align: center;
 }
 
 #voorspellingDagen>div>.datum, #voorspellingDagen>div>.korteDatum {
@@ -842,13 +843,23 @@ article#instellingen fieldset {
   padding: 0.75rem 1.5rem;
 }
 
+/* Verander locatie button */
+#instellingen button {
+  width: 200px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  border: 0;
+  /* Om mooi te laten matchen met de select moet er 1px extra meegegeven worden. Select is raar. */
+  padding: calc(0.25rem + 1px) calc(0.5rem + 1px);
+  color: #777;
+  text-align: left;
+}
+
 /* Styling voor select elements */
 .conSelect {
   position: relative;
-  width: 100%;
   cursor: pointer;
   width: 200px;
-  cursor: pointer;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }

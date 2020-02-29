@@ -18,6 +18,7 @@ define('DARKSKY_APIKEY', "DARKSKY_APIKEY");
 define('OPENCAGE_APIURL', "https://api.opencagedata.com/geocode/v1/json?q=");
 define('DARKSKY_APIURL', "https://api.darksky.net/forecast/". DARKSKY_APIKEY ."/");
 define('BUIENRADAR_APIURL', "https://data.buienradar.nl/2.0/feed/json");
+define('MYMEMORY_APIURL', "https://api.mymemory.translated.net/get?q=");
 
 // Database
 $DATABASE_HOST = 'DATABASE_HOST';
@@ -53,7 +54,7 @@ $JSON;
 // Eerst proberen vanaf database
 $result = $conn->query("SELECT * FROM weer WHERE `stad`='$city' ORDER BY `timestamp` DESC LIMIT 1");
 if (!$result) {
-  error(500, "Fout met het database query. (1)");
+  error(500, "Fout met database query. (1)");
   error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
 }
 
@@ -64,12 +65,6 @@ if ($result->num_rows == 1) {
     // Data is nog niet verouderd en uur is nog niet veranderd.
     $dataFromDatabase = true;
     $JSON = json_decode($row['JSON'], true);
-  } else {
-    // Verwijder oude data
-    if (!$conn->query("DELETE FROM weer WHERE `stad`='$city' AND `timestamp`='".$row['timestamp']."'")) {
-      error(500, "Fout met het database query. (2)");
-      error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
-    }
   }
 }
 
@@ -78,7 +73,7 @@ if (!$dataFromDatabase) {
   $DARKSKY_DATA = cURL(DARKSKY_APIURL . $coords . "?lang=nl&units=ca");
   $BUIENRADAR_DATA = cURL(BUIENRADAR_APIURL);
 
-  // Als er een errorcode is
+  // Als er een errorcode is gooi een error terug
   if (isset($DARKSKY_DATA['code'])) {
     error_log("DarkSky error " . $DARKSKY_DATA['code'] . ": " . $DARKSKY_DATA['error']);
     error($DARKSKY_DATA['code'], $DARKSKY_DATA['error']);
@@ -95,6 +90,7 @@ if (!$dataFromDatabase) {
   $JSON['huidig']['windKracht'] = getWindBft($DARKSKY_DATA['currently']['windSpeed']);
   $JSON['huidig']['windRichting'] = getWindDir($DARKSKY_DATA['currently']['windBearing']);
 
+  $JSON['voorspelling']['verhaal']['tijd'] = $BUIENRADAR_DATA['forecast']['weatherreport']['published'];
   $JSON['voorspelling']['verhaal']['titel'] = $BUIENRADAR_DATA['forecast']['weatherreport']['title'];
   $JSON['voorspelling']['verhaal']['samenvatting'] = $BUIENRADAR_DATA['forecast']['weatherreport']['summary'];
   $JSON['voorspelling']['verhaal']['auteur'] = $BUIENRADAR_DATA['forecast']['weatherreport']['author'];
@@ -122,12 +118,61 @@ if (!$dataFromDatabase) {
     $JSON['voorspelling']['uurlijks'][$i]['windRichting'] = getWindDir($DARKSKY_DATA['hourly']['data'][$i]['windBearing']);
   }
 
+  // Gooi de opgehaalde weerdata in de database
   $stmt = $conn->prepare("INSERT INTO `weer` (`timestamp`, `stad`, `JSON`) VALUES ('$time', '$city', ?)");
   $stmt->bind_param('s', json_encode($JSON));
   $result = $stmt->execute();
   if (!$result) {
-    error(500, "Fout met het database query. (3)");
+    error(500, "Fout met database query. (3)");
     error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
+  }
+}
+
+// Krijg alle momenteel ondersteunde talen
+$languages = Array();
+foreach (glob('./content/lang/*.lang.js') as $langFile) {
+  array_push($languages, preg_replace("/.*\/(\w\w)_\w\w\.lang\.js/", "$1", $langFile));
+}
+
+// Krijg de taal die de gebruiker wil en kijk of die taal überhaupt ondersteund wordt of dat iemand gewoon de API wil leegtrekken
+// Controleer ook nog of de gebruiker een plaats uit NL wil, anders heeft het toch geen zin
+$lang = GET('lang');
+if (!empty($lang) && $lang != 'nl' && in_array($lang, $languages) && explode(',', $city)[1] == 'NL') {
+  error_log('1');
+  $titel; $samenvatting;
+  $tijd = $JSON['voorspelling']['verhaal']['tijd'];
+  
+  // Misschien staan de vertalingen nog in de database
+  $result = $conn->query("SELECT * FROM weerverhaal WHERE `taal`='$lang' AND `tijd`='$tijd' LIMIT 1");
+  if (!$result) {
+    error(500, "Fout met database query. (8)");
+    error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
+  }
+  
+  if ($result->num_rows == 1) {
+    error_log('2');
+    $row = $result->fetch_assoc();
+    $JSON['voorspelling']['verhaal']['titel'] = $row['titel'];
+    $JSON['voorspelling']['verhaal']['samenvatting'] = $row['samenvatting'];
+  }
+  // De vertalingen ophalen met de MyMemory API
+  else {
+    error_log('3');
+    $titelResponse = cURL(MYMEMORY_APIURL . urlencode($JSON['voorspelling']['verhaal']['titel']) . '&langpair=nl|' . $lang);
+    $samenvattingResponse = cURL(MYMEMORY_APIURL . urlencode($JSON['voorspelling']['verhaal']['samenvatting']) . '&langpair=nl|' . $lang);
+    
+    $titel = $titelResponse['responseStatus'] == 200 ? $titelResponse['responseData']['translatedText'] : '';
+    $samenvatting = $samenvattingResponse['responseStatus'] == 200 ? $samenvattingResponse['responseData']['translatedText'] : '';
+    
+    $JSON['voorspelling']['verhaal']['titel'] = $titel;
+    $JSON['voorspelling']['verhaal']['samenvatting'] = $samenvatting; 
+    
+    // En zet de vertalingen in de database
+    $result = $conn->query("INSERT INTO `weerverhaal` (`taal`, `tijd`, `titel`, `samenvatting`) VALUES ('$lang', '$tijd', '$titel', '$samenvatting')");
+    if (!$result) {
+      error(500, "Fout met database query. (9)");
+      error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
+    }
   }
 }
 
@@ -171,7 +216,7 @@ function getCoordsByCity($conn, $city) {
 
   $result = $conn->query($query);
   if (!$result) {
-    error(500, "Fout met het database query. (4)");
+    error(500, "Fout met database query. (4)");
     error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
   }
 
@@ -198,7 +243,7 @@ function getCoordsByCity($conn, $city) {
       // Voeg de data toe aan de database
       if (!$conn->query("INSERT INTO `steden` (`stad`, `coords`) VALUES ('$city', '$coords')")) {
         error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
-        error(500, "Fout met het database query. (5)");
+        error(500, "Fout met database query. (5)");
       }
       return $coords;
     }
@@ -231,7 +276,7 @@ function getCityByCoords($conn, $coords) {
   $result = $conn->query("SELECT * FROM steden WHERE `coords`='$coords' LIMIT 1");
   if (!$result) {
     error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
-    error(500, "Fout met het database query. (6)");
+    error(500, "Fout met database query. (6)");
   }
 
   if ($result->num_rows == 1) {
@@ -254,7 +299,7 @@ function getCityByCoords($conn, $coords) {
       // Voeg de data toe aan de database
       if (!$conn->query("INSERT INTO `steden` (`stad`, `coords`) VALUES ('$city', '$coords')")) {
         error_log("MySQLi query error: " . $conn->errno . ": " . $conn->error);
-        error(500, "Fout met het database query. (7)");
+        error(500, "Fout met database query. (7)");
       }
       return $city;
     }
@@ -294,52 +339,20 @@ function getWindDir($degree) {
  * @return Windforce De windkracht (windsnelheid in beaufort)
  */
 function getWindBft($speed) {
-  switch (true) {
-    case ($speed < 1):
-      $bft = 0;
-      break;
-    case ($speed <= 5):
-      $bft = 1;
-      break;
-    case ($speed <= 11):
-      $bft = 2;
-      break;
-    case ($speed <= 19):
-      $bft = 3;
-      break;
-    case ($speed <= 28):
-      $bft = 4;
-      break;
-    case ($speed <= 38):
-      $bft = 5;
-      break;
-    case ($speed <= 49):
-      $bft = 6;
-      break;
-    case ($speed <= 61):
-      $bft = 7;
-      break;
-    case ($speed <= 74):
-      $bft = 8;
-      break;
-    case ($speed <= 88):
-      $bft = 9;
-      break;
-    case ($speed <= 102):
-      $bft = 10;
-      break;
-    case ($speed <= 117):
-      $bft = 11;
-      break;
-    case ($speed > 117):
-      $bft = 12;
-      break;
-    default:
-      $bft = null;
-      break;
-  }
-
-  return $bft;
+  if ($speed < 1) return 0;
+  elseif ($speed <= 5) return 1;
+  elseif ($speed <= 11) return 2;
+  elseif ($speed <= 19) return 3;
+  elseif ($speed <= 28) return 4;
+  elseif ($speed <= 38) return 5;
+  elseif ($speed <= 49) return 6;
+  elseif ($speed <= 61) return 7;
+  elseif ($speed <= 74) return 8;
+  elseif ($speed <= 88) return 9;
+  elseif ($speed <= 102) return 10;
+  elseif ($speed <= 117) return 11;
+  elseif ($speed > 117) return 12;
+  else return null;
 }
 
 /**
@@ -362,5 +375,5 @@ function error($code, $msg) {
 function GET($parameter) {
   // XSS preventie, better safe than sorry.
   $value = trim(strip_tags($_GET[$parameter]));
-  return (empty($value)) ? null : urldecode($value);
+  return empty($value) ? null : urldecode($value);
 }
