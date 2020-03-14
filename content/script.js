@@ -36,7 +36,7 @@ var filters = {
     else return 3;
   },
   // Zet een timestamp om in de dag van de week (bijvoorbeeld Maandag).
-  // Als met de param 'kort' true wordt meegegeven krijgen we de eerste 2 letters van de dag (bijvoobeeld Ma) 
+  // Als met de param 'kort' true wordt meegegeven krijgen we de eerste 2 letters van de dag (bijvoobeeld Ma)
   dag: function(timestamp, kort = false) {
     var dagen = dataSite.lang.other.days_absolute;
     var dag = dagen[new Date(timestamp * 1000).getDay()];
@@ -89,7 +89,7 @@ var filters = {
       // Als de property niet gevonden kon worden, gooi false terug
       else return false;
     }
-    
+
     // Krijg de links en placeholders
     var links = [...tekst.matchAll(/\[.+?\]/g)];
     var placeholders = [...tekst.matchAll(/{.+?}/g)];
@@ -101,7 +101,7 @@ var filters = {
     }
     for (var i=0; i < placeholders.length; i++)
       tekst = tekst.replace(placeholders[i], arguments[2][i]);
-    
+
     return tekst;
   },
   // Krijg het het goede pad naar het welkomstbericht
@@ -113,7 +113,7 @@ var filters = {
 var methods = {
   // Update een instelling op basis van een 'select' verander event en gooi een signaal terug naar de gebruiker
   updateSetting: function(e) {
-    setSetting(e.target.dataset.setting, e.target.value);
+    setSetting(e.target.dataset.setting, e.target.value, true);
     $("#settingChange").css('transition', 'none');
     $("#settingChange").css('transform', 'scale(0)');
     setTimeout(function() {
@@ -139,11 +139,11 @@ $(document).ready(function() {
   // Vraag de goede pagina aan op basis van de hash
   loadPage(location.hash.substr(1));
 
-  // Laad de weerdata in en zet een interval om elke 10 seconden de weerdata in te laden 
+  // Laad de weerdata in en zet een interval om elke 10 seconden de weerdata in te laden
   loadData(true);
   dataInterval = setInterval(loadData, 10 * 1000);
-  
-  // Als er naast de city popup wordt geklikt of als er op de Escape knop wordt gedrukt, sluit dan de popup 
+
+  // Als er naast de city popup wordt geklikt of als er op de Escape knop wordt gedrukt, sluit dan de popup
   $("body").keydown(function(e) {
     if (e.key == 'Escape' && $("#cityPopup").css('display') == 'block') setPopupStatus(false);
   })
@@ -154,7 +154,7 @@ function loadPage(page) {
   page = page.toLowerCase();
   // Scroll naar boven
   window.scroll(0, 0);
-  
+
   if (page === 'voorspelling') {
     location.hash = '#voorspelling';
     document.title = `GrimSky | ${dataSite.lang.header.forecast}`;
@@ -207,7 +207,7 @@ function setLoader(status, bg = false) {
   } else loader.css('display', 'none');
 }
 
-/* 
+/*
  * Krijg de weerdata. Als het de eerste keer is, zet dan het laadbalkje aan.
  * Als er vandaag al te veel requests zijn gedaan naar de server, zet de site dan voor vandaag onbruikbaar
  * Als de response code geen 200 is EN het is de eerste keer, zet hem dan weer op de standaard stad en probeer het opnieuw
@@ -225,20 +225,20 @@ function loadData(first = false) {
       localStorage.setItem('plaats', 'Amsterdam');
       loadData();
     } else {
-      alert('Er is iets foutgegaan, probeer het later nog een keer.');
+      console[console.exception ? 'exception' : 'log']('Request failed');
     }
   })
 }
 
 // Zet de ingeladen weerdata + de instellingen van de gebruiker in de website
 function setData(weerdata) {
-  setWindmill(weerdata.huidig.windKracht);
-  setBackground(weerdata.huidig.temperatuur);
+  setWindmillSpeed(weerdata.huidig.windKracht);
+  setBackgroundTemperature(weerdata.huidig.temperatuur);
 
   dataSite.talen = [...document.getElementsByTagName('script')]
     // Alleen language scripts
     .filter(el => el.src.endsWith('.lang.js'))
-    // Krijg de taalcode (Bijvoorbeeld nl_nl) 
+    // Krijg de taalcode (Bijvoorbeeld nl_nl)
     // en de naam van de taal (Bijvoorbeeld Nederlands) en zet die in een array
     .map(function(langFile) {
       var langCode = langFile.src.replace(/.*\/(\w\w_\w\w)\.lang\.js/g, '$1');
@@ -255,7 +255,7 @@ function setData(weerdata) {
   dataSite.laatsteUpdate = weerdata.time;
   // Splitten [0] stad, [1] landcode
   dataSite.city = weerdata.plaats.split(',');
-  
+
   dataSite.huidig = weerdata.huidig;
 
   dataSite.verhaal = weerdata.voorspelling.verhaal;
@@ -275,14 +275,14 @@ function setData(weerdata) {
 }
 
 // Zet de snelheid van de windmolen op basis van de windkracht
-function setWindmill(windkracht) {
+function setWindmillSpeed(windkracht) {
   var wieken = document.getElementById('windmolen-wieken');
   var snelheid = (windkracht <= 0) ? 0 : (1 / (windkracht / 8));
   wieken.style.animationDuration = snelheid + 's';
 }
 
 // Zet de achtergrond van de website op basis van de temperatuur
-function setBackground(temperature) {
+function setBackgroundTemperature(temperature) {
   var H = Math.max(10, 144 - temperature * 3.6);
   $("#container").css('background-color', 'hsl(' + H + ', 70%, 75%)');
 }
@@ -432,8 +432,8 @@ function getSetting(setting) {
 }
 
 // Stel een instelling in en update Vue
-function setSetting(setting, value) {
+function setSetting(setting, value, load = false) {
   localStorage.setItem(`setting_${setting}`, value);
-  
-  loadData();
+
+  if (load) loadData();
 }
